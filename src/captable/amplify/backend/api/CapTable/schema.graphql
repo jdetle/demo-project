@@ -1,0 +1,26 @@
+type Owner @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  percent: Float
+  roundsInvested: AWSJSON
+  lastModified: AWSTimestamp
+  fundingrounds: [FundingRoundOwner] @connection(keyName: "byOwner", fields: ["id"])
+  isFounder: Boolean
+  firstName: String
+  lastName: String
+}
+
+type FundingRound @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  valuation: Float
+  date: AWSDate
+  FundingRoundOwners: [FundingRoundOwner!] @connection(keyName: "byFundingRound", fields: ["id"])
+}
+
+type FundingRoundOwner @model(queries: null) @key(name: "byFundingRound", fields: ["fundingroundID", "ownerID"]) @key(name: "byOwner", fields: ["ownerID", "fundingroundID"]) @auth(rules: [{allow: public}, {allow: public}]) {
+  id: ID!
+  fundingroundID: ID!
+  ownerID: ID!
+  fundinground: FundingRound! @connection(fields: ["fundingroundID"])
+  owner: Owner! @connection(fields: ["ownerID"])
+}
+ 
